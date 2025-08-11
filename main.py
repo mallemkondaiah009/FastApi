@@ -1,26 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException
-from database.schemas import all_tasks
-from database.models import Todo
-from config import collection
-
+# main.py
+from fastapi import FastAPI
+from routes.todo_routes import router
 
 app = FastAPI()
-router = APIRouter()
-
-
-@router.get("/")
-async def get_all_todos():
-    data = collection.find()
-    return all_tasks(data)
-
-@router.post("/")
-async def create_task(new_task: Todo):
-    try:
-        resp = collection.insert_one(dict(new_task))
-        return {
-            "status_code": 200,
-            "id": str(resp.inserted_id)
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-app.include_router(router)
+app.include_router(router, prefix="/api/todo", tags=["todos"])
